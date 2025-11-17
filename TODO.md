@@ -1,2 +1,4 @@
 - [x] Update RegisterSerializer fields to match frontend data
 - [x] Test the register endpoint after changes
+- [x] Update LoginPage.tsx to navigate superusers to /admin after login
+- [ ] Test login navigation for staff and regular users

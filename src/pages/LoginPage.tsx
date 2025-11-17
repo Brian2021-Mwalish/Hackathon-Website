@@ -21,7 +21,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 const LoginPage = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
 
   const {
@@ -42,7 +42,12 @@ const LoginPage = () => {
         password: data.password,
       });
       if (success) {
-        navigate("/");
+        // Navigate to admin dashboard if user is staff, otherwise to home
+        if (user?.is_staff) {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       } else {
         setError("Invalid email or password");
       }
