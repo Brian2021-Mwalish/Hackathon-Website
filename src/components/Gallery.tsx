@@ -1,40 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+interface Photo {
+  id: number;
+  title: string;
+  description: string;
+  image_url: string;
+  uploaded_by_name: string;
+  uploaded_at: string;
+}
 
 const Gallery = () => {
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const images = [
-    {
-      title: "Hackathon 2024",
-      description: "Teams collaborating on innovative projects",
-      gridClass: "md:col-span-2 md:row-span-2",
-    },
-    {
-      title: "Workshop Session",
-      description: "Learning new technologies together",
-      gridClass: "md:col-span-1",
-    },
-    {
-      title: "Award Ceremony",
-      description: "Celebrating our winners",
-      gridClass: "md:col-span-1",
-    },
-    {
-      title: "Tech Talk",
-      description: "Industry experts sharing insights",
-      gridClass: "md:col-span-1",
-    },
-    {
-      title: "Team Building",
-      description: "BITSA community gathering",
-      gridClass: "md:col-span-2",
-    },
-    {
-      title: "Coding Session",
-      description: "Students working on projects",
-      gridClass: "md:col-span-1",
-    },
-  ];
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/gallery/photos/');
+        if (response.ok) {
+          const data = await response.json();
+          setPhotos(data);
+        } else {
+          setError('Failed to load photos');
+        }
+      } catch (err) {
+        setError('Error loading photos');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPhotos();
+  }, []);
 
   return (
     <section className="py-20">
@@ -48,31 +47,44 @@ const Gallery = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {images.map((image, index) => (
-            <div
-              key={index}
-              className={`${image.gridClass} relative group cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 aspect-square md:aspect-auto min-h-[250px]`}
-              onClick={() => setSelectedImage(index)}
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
-                <div className="text-white">
-                  <h3 className="font-bold text-xl mb-1">{image.title}</h3>
-                  <p className="text-sm opacity-90">{image.description}</p>
-                </div>
-              </div>
-              <div className="w-full h-full flex items-center justify-center">
-                <div className="text-center p-6">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                    <span className="text-3xl">📸</span>
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Loading photos...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-red-500">{error}</p>
+          </div>
+        ) : photos.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No photos available yet.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {photos.map((photo, index) => (
+              <div
+                key={photo.id}
+                className="relative group cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 aspect-square min-h-[300px]"
+                onClick={() => setSelectedImage(index)}
+              >
+                <img
+                  src={photo.image_url}
+                  alt={photo.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                  <div className="text-white">
+                    <h3 className="font-bold text-xl mb-1">{photo.title}</h3>
+                    <p className="text-sm opacity-90">{photo.description}</p>
+                    <p className="text-xs opacity-75 mt-2">
+                      By {photo.uploaded_by_name} • {new Date(photo.uploaded_at).toLocaleDateString()}
+                    </p>
                   </div>
-                  <h3 className="font-semibold text-lg mb-2 text-foreground">{image.title}</h3>
-                  <p className="text-sm text-muted-foreground">{image.description}</p>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         <div className="text-center mt-8 text-sm text-muted-foreground">
           <p>📷 Photos from BITSA events and activities</p>
