@@ -12,7 +12,7 @@ class BlogPostSerializer(serializers.ModelSerializer):
             'category', 'tags', 'read_time', 'is_published', 'created_at',
             'updated_at', 'published_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'published_at']
+        read_only_fields = ['id', 'author', 'created_at', 'updated_at', 'published_at']
 
     def create(self, validated_data):
         validated_data['author'] = self.context['request'].user

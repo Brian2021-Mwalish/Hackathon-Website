@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Calendar, User, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,6 +23,7 @@ interface BlogPost {
 }
 
 const Blog = () => {
+  const navigate = useNavigate();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -31,9 +33,7 @@ const Blog = () => {
         const response = await fetch('http://localhost:8000/api/blogs/posts/');
         if (response.ok) {
           const data = await response.json();
-          // Filter only published posts
-          const publishedPosts = data.filter((post: BlogPost) => post.is_published);
-          setPosts(publishedPosts);
+          setPosts(data);
         } else {
           console.error('Failed to fetch blog posts');
         }
@@ -94,7 +94,11 @@ const Blog = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button variant="ghost" className="w-full group/btn">
+                  <Button
+                    variant="ghost"
+                    className="w-full group/btn"
+                    onClick={() => navigate(`/blog/${post.id}`)}
+                  >
                     Read Article
                     <ArrowRight size={16} className="ml-2 group-hover/btn:translate-x-1 transition-transform" />
                   </Button>

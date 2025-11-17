@@ -3,6 +3,9 @@
 import os
 import sys
 
+# Add bitsa-backend to Python path
+sys.path.insert(0, 'bitsa-backend')
+
 
 def main():
     """Run administrative tasks."""

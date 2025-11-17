@@ -21,13 +21,23 @@ class IsAuthorOrAdmin(permissions.BasePermission):
 class BlogPostViewSet(viewsets.ModelViewSet):
     queryset = BlogPost.objects.all()
     serializer_class = BlogPostSerializer
-    permission_classes = [permissions.IsAuthenticated, IsAuthorOrAdmin]
+
+    def get_permissions(self):
+        """
+        Allow anyone to read published posts, but require authentication for write operations.
+        """
+        if self.action in ['list', 'retrieve']:
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated(), IsAuthorOrAdmin()]
 
     def get_queryset(self):
         queryset = BlogPost.objects.all()
 
-        # Filter by published status for non-admin users
-        if not self.request.user.is_staff:
+        # For list/retrieve actions, only show published posts to non-authenticated users
+        if self.action in ['list', 'retrieve'] and not self.request.user.is_authenticated:
+            queryset = queryset.filter(is_published=True)
+        # For authenticated non-admin users, also filter by published status
+        elif self.request.user.is_authenticated and not self.request.user.is_staff:
             queryset = queryset.filter(is_published=True)
 
         # Filter by author if specified
