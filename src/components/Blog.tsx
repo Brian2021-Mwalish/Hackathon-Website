@@ -1,34 +1,51 @@
+import { useState, useEffect } from "react";
 import { Calendar, User, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+interface BlogPost {
+  id: number;
+  title: string;
+  content: string;
+  excerpt: string;
+  author: number;
+  author_name: string;
+  author_email: string;
+  category: string;
+  tags: string;
+  read_time: number;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+}
 
 const Blog = () => {
-  const posts = [
-    {
-      title: "Hackathon Success Tips: From Planning to Winning",
-      excerpt: "Learn the strategies that winning teams use to excel in hackathons, from ideation to final presentation.",
-      author: "Alpha Chamba",
-      date: "October 28, 2025",
-      category: "Tips & Tricks",
-      readTime: "5 min read",
-    },
-    {
-      title: "Getting Started with React and TypeScript",
-      excerpt: "A comprehensive guide for beginners looking to build modern web applications with React and TypeScript.",
-      author: "Gloria Jebet",
-      date: "October 25, 2025",
-      category: "Tutorial",
-      readTime: "8 min read",
-    },
-    {
-      title: "Building Responsive Websites with Tailwind CSS",
-      excerpt: "Discover how to create beautiful, responsive designs quickly using Tailwind CSS utility classes.",
-      author: "BITSA Team",
-      date: "October 20, 2025",
-      category: "Web Design",
-      readTime: "6 min read",
-    },
-  ];
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBlogPosts = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/blogs/posts/');
+        if (response.ok) {
+          const data = await response.json();
+          // Filter only published posts
+          const publishedPosts = data.filter((post: BlogPost) => post.is_published);
+          setPosts(publishedPosts);
+        } else {
+          console.error('Failed to fetch blog posts');
+        }
+      } catch (error) {
+        console.error('Error fetching blog posts:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogPosts();
+  }, []);
 
   return (
     <section className="py-20 bg-muted/30">
@@ -42,42 +59,56 @@ const Blog = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {posts.map((post, index) => (
-            <Card key={index} className="hover:shadow-xl transition-all border-border group">
-              <CardHeader>
-                <div className="text-sm text-accent font-semibold mb-2">
-                  {post.category}
-                </div>
-                <CardTitle className="text-xl group-hover:text-primary transition-colors">
-                  {post.title}
-                </CardTitle>
-                <CardDescription className="line-clamp-2">
-                  {post.excerpt}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <User size={14} className="mr-2" />
-                  {post.author}
-                </div>
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <div className="flex items-center">
-                    <Calendar size={14} className="mr-2" />
-                    {post.date}
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Loading blog posts...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {posts.map((post) => (
+              <Card key={post.id} className="hover:shadow-xl transition-all border-border group">
+                <CardHeader>
+                  <div className="flex items-center justify-between mb-2">
+                    <Badge variant="secondary" className="text-xs">
+                      {post.category}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {post.read_time} min read
+                    </span>
                   </div>
-                  <span>{post.readTime}</span>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button variant="ghost" className="w-full group/btn">
-                  Read Article
-                  <ArrowRight size={16} className="ml-2 group-hover/btn:translate-x-1 transition-transform" />
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+                  <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                    {post.title}
+                  </CardTitle>
+                  <CardDescription className="line-clamp-2">
+                    {post.excerpt}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <User size={14} className="mr-2" />
+                    {post.author_name}
+                  </div>
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Calendar size={14} className="mr-2" />
+                    {new Date(post.published_at || post.created_at).toLocaleDateString()}
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button variant="ghost" className="w-full group/btn">
+                    Read Article
+                    <ArrowRight size={16} className="ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {posts.length === 0 && !loading && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No blog posts available yet.</p>
+          </div>
+        )}
 
         <div className="text-center mt-12">
           <Button size="lg" variant="outline">

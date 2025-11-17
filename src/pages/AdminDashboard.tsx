@@ -11,7 +11,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Users, FileText, Calendar, Image, BarChart3, Settings, UserPlus, Ban, CheckCircle, Trash2, Edit } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Users, FileText, Calendar, Image, BarChart3, Settings, UserPlus, Ban, CheckCircle, Trash2, Edit, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 interface User {
@@ -78,6 +80,25 @@ const AdminDashboard = () => {
     title: '',
     description: '',
     image: null as File | null
+  });
+  const [addBlogDialogOpen, setAddBlogDialogOpen] = useState(false);
+  const [editBlogDialogOpen, setEditBlogDialogOpen] = useState(false);
+  const [selectedBlogPost, setSelectedBlogPost] = useState<BlogPost | null>(null);
+  const [newBlogPost, setNewBlogPost] = useState({
+    title: '',
+    content: '',
+    excerpt: '',
+    category: 'General',
+    tags: '',
+    read_time: 5
+  });
+  const [editBlogPost, setEditBlogPost] = useState({
+    title: '',
+    content: '',
+    excerpt: '',
+    category: 'General',
+    tags: '',
+    read_time: 5
   });
 
   // Redirect if not authenticated or not admin
@@ -364,6 +385,94 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       toast.error('Error deleting blog post');
+    }
+  };
+
+  const addBlogPost = async () => {
+    if (!newBlogPost.title || !newBlogPost.content) {
+      toast.error('Please provide a title and content');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/blogs/posts/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(newBlogPost),
+      });
+
+      if (response.ok) {
+        toast.success('Blog post created successfully');
+        setAddBlogDialogOpen(false);
+        setNewBlogPost({
+          title: '',
+          content: '',
+          excerpt: '',
+          category: 'General',
+          tags: '',
+          read_time: 5
+        });
+        fetchBlogPosts();
+      } else {
+        const error = await response.json();
+        toast.error(error.error || 'Failed to create blog post');
+      }
+    } catch (error) {
+      toast.error('Error creating blog post');
+    }
+  };
+
+  const openEditBlogDialog = (post: BlogPost) => {
+    setSelectedBlogPost(post);
+    setEditBlogPost({
+      title: post.title,
+      content: post.content,
+      excerpt: post.excerpt,
+      category: post.category,
+      tags: post.tags,
+      read_time: post.read_time
+    });
+    setEditBlogDialogOpen(true);
+  };
+
+  const editBlogPostSubmit = async () => {
+    if (!selectedBlogPost || !editBlogPost.title || !editBlogPost.content) {
+      toast.error('Please provide a title and content');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/blogs/posts/${selectedBlogPost.id}/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(editBlogPost),
+      });
+
+      if (response.ok) {
+        toast.success('Blog post updated successfully');
+        setEditBlogDialogOpen(false);
+        setSelectedBlogPost(null);
+        setEditBlogPost({
+          title: '',
+          content: '',
+          excerpt: '',
+          category: 'General',
+          tags: '',
+          read_time: 5
+        });
+        fetchBlogPosts();
+      } else {
+        const error = await response.json();
+        toast.error(error.error || 'Failed to update blog post');
+      }
+    } catch (error) {
+      toast.error('Error updating blog post');
     }
   };
 
@@ -730,6 +839,97 @@ const AdminDashboard = () => {
                     <h3 className="text-lg font-medium">All Blog Posts</h3>
                     <p className="text-sm text-muted-foreground">Manage blog content and publication status</p>
                   </div>
+                  <Dialog open={addBlogDialogOpen} onOpenChange={setAddBlogDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Blog Post
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Add New Blog Post</DialogTitle>
+                        <DialogDescription>
+                          Create a new blog post for the website.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="blog_title">Title *</Label>
+                          <Input
+                            id="blog_title"
+                            value={newBlogPost.title}
+                            onChange={(e) => setNewBlogPost({ ...newBlogPost, title: e.target.value })}
+                            placeholder="Enter blog post title"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="blog_excerpt">Excerpt</Label>
+                          <Textarea
+                            id="blog_excerpt"
+                            value={newBlogPost.excerpt}
+                            onChange={(e) => setNewBlogPost({ ...newBlogPost, excerpt: e.target.value })}
+                            placeholder="Enter a brief excerpt"
+                            rows={3}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="blog_content">Content *</Label>
+                          <Textarea
+                            id="blog_content"
+                            value={newBlogPost.content}
+                            onChange={(e) => setNewBlogPost({ ...newBlogPost, content: e.target.value })}
+                            placeholder="Enter the full blog post content"
+                            rows={10}
+                          />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="blog_category">Category</Label>
+                            <Select value={newBlogPost.category} onValueChange={(value) => setNewBlogPost({ ...newBlogPost, category: value })}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select category" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="General">General</SelectItem>
+                                <SelectItem value="Technology">Technology</SelectItem>
+                                <SelectItem value="Events">Events</SelectItem>
+                                <SelectItem value="Tutorials">Tutorials</SelectItem>
+                                <SelectItem value="News">News</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label htmlFor="blog_read_time">Read Time (minutes)</Label>
+                            <Input
+                              id="blog_read_time"
+                              type="number"
+                              value={newBlogPost.read_time}
+                              onChange={(e) => setNewBlogPost({ ...newBlogPost, read_time: parseInt(e.target.value) || 5 })}
+                              placeholder="5"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="blog_tags">Tags</Label>
+                          <Input
+                            id="blog_tags"
+                            value={newBlogPost.tags}
+                            onChange={(e) => setNewBlogPost({ ...newBlogPost, tags: e.target.value })}
+                            placeholder="Enter tags separated by commas"
+                          />
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" onClick={() => setAddBlogDialogOpen(false)}>
+                            Cancel
+                          </Button>
+                          <Button onClick={addBlogPost}>
+                            Create Blog Post
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
 
                 {loading ? (
@@ -760,6 +960,13 @@ const AdminDashboard = () => {
                           <TableCell>{new Date(post.created_at).toLocaleDateString()}</TableCell>
                           <TableCell>
                             <div className="flex gap-1">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => openEditBlogDialog(post)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
                               {post.is_published ? (
                                 <Button
                                   variant="outline"
@@ -919,6 +1126,93 @@ const AdminDashboard = () => {
                 </Button>
                 <Button onClick={editPhotoSubmit}>
                   Update Photo
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Blog Post Dialog */}
+        <Dialog open={editBlogDialogOpen} onOpenChange={setEditBlogDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Edit Blog Post</DialogTitle>
+              <DialogDescription>
+                Update the blog post details.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit_blog_title">Title *</Label>
+                <Input
+                  id="edit_blog_title"
+                  value={editBlogPost.title}
+                  onChange={(e) => setEditBlogPost({ ...editBlogPost, title: e.target.value })}
+                  placeholder="Enter blog post title"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit_blog_excerpt">Excerpt</Label>
+                <Textarea
+                  id="edit_blog_excerpt"
+                  value={editBlogPost.excerpt}
+                  onChange={(e) => setEditBlogPost({ ...editBlogPost, excerpt: e.target.value })}
+                  placeholder="Enter a brief excerpt"
+                  rows={3}
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit_blog_content">Content *</Label>
+                <Textarea
+                  id="edit_blog_content"
+                  value={editBlogPost.content}
+                  onChange={(e) => setEditBlogPost({ ...editBlogPost, content: e.target.value })}
+                  placeholder="Enter the full blog post content"
+                  rows={10}
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="edit_blog_category">Category</Label>
+                  <Select value={editBlogPost.category} onValueChange={(value) => setEditBlogPost({ ...editBlogPost, category: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="General">General</SelectItem>
+                      <SelectItem value="Technology">Technology</SelectItem>
+                      <SelectItem value="Events">Events</SelectItem>
+                      <SelectItem value="Tutorials">Tutorials</SelectItem>
+                      <SelectItem value="News">News</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="edit_blog_read_time">Read Time (minutes)</Label>
+                  <Input
+                    id="edit_blog_read_time"
+                    type="number"
+                    value={editBlogPost.read_time}
+                    onChange={(e) => setEditBlogPost({ ...editBlogPost, read_time: parseInt(e.target.value) || 5 })}
+                    placeholder="5"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="edit_blog_tags">Tags</Label>
+                <Input
+                  id="edit_blog_tags"
+                  value={editBlogPost.tags}
+                  onChange={(e) => setEditBlogPost({ ...editBlogPost, tags: e.target.value })}
+                  placeholder="Enter tags separated by commas"
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setEditBlogDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={editBlogPostSubmit}>
+                  Update Blog Post
                 </Button>
               </div>
             </div>
