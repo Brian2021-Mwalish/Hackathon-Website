@@ -28,3 +28,17 @@ class RegisterSerializer(serializers.Serializer):
             password=make_password(validated_data["password"]),
         )
         return user
+
+class UserSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    role = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'name', 'role', 'is_staff', 'is_active', 'date_joined']
+
+    def get_name(self, obj):
+        return f"{obj.first_name} {obj.last_name}".strip() or obj.username
+
+    def get_role(self, obj):
+        return 'admin' if obj.is_staff else 'student'

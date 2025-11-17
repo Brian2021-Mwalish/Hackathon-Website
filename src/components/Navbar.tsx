@@ -17,7 +17,7 @@ const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-primary/90 via-primary/80 to-accent/90 backdrop-blur-lg border-b border-primary/20 shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2">
@@ -25,40 +25,40 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
             <Link
               to="/"
-              className="text-foreground hover:text-primary transition-colors"
+              className="text-white hover:text-accent transition-all duration-300 hover:scale-105 font-medium"
             >
               Home
             </Link>
             <Link
               to="/about"
-              className="text-foreground hover:text-primary transition-colors"
+              className="text-white hover:text-accent transition-all duration-300 hover:scale-105 font-medium"
             >
               About
             </Link>
             <Link
               to="/events"
-              className="text-foreground hover:text-primary transition-colors"
+              className="text-white hover:text-accent transition-all duration-300 hover:scale-105 font-medium"
             >
               Events
             </Link>
             <Link
               to="/blog"
-              className="text-foreground hover:text-primary transition-colors"
+              className="text-white hover:text-accent transition-all duration-300 hover:scale-105 font-medium"
             >
               Blog
             </Link>
             <Link
               to="/gallery"
-              className="text-foreground hover:text-primary transition-colors"
+              className="text-white hover:text-accent transition-all duration-300 hover:scale-105 font-medium"
             >
               Gallery
             </Link>
             <Link
               to="/contact"
-              className="text-foreground hover:text-primary transition-colors"
+              className="text-white hover:text-accent transition-all duration-300 hover:scale-105 font-medium"
             >
               Contact
             </Link>
@@ -122,7 +122,7 @@ const Navbar = () => {
 
           {/* Mobile menu button */}
           <button
-            className="md:hidden text-foreground"
+            className="md:hidden text-white hover:text-accent transition-colors p-2 rounded-lg hover:bg-white/10"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -131,65 +131,65 @@ const Navbar = () => {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden py-4 space-y-4 border-t border-border">
+          <div className="md:hidden py-4 space-y-2 border-t border-white/20 bg-gradient-to-b from-primary/95 to-accent/95 backdrop-blur-lg">
             <Link
               to="/"
-              className="block w-full text-left text-foreground hover:text-primary transition-colors py-2"
+              className="block w-full text-left text-white hover:text-accent hover:bg-white/10 transition-all duration-300 py-3 px-4 rounded-lg font-medium"
               onClick={() => setIsOpen(false)}
             >
               Home
             </Link>
             <Link
               to="/about"
-              className="block w-full text-left text-foreground hover:text-primary transition-colors py-2"
+              className="block w-full text-left text-white hover:text-accent hover:bg-white/10 transition-all duration-300 py-3 px-4 rounded-lg font-medium"
               onClick={() => setIsOpen(false)}
             >
               About
             </Link>
             <Link
               to="/events"
-              className="block w-full text-left text-foreground hover:text-primary transition-colors py-2"
+              className="block w-full text-left text-white hover:text-accent hover:bg-white/10 transition-all duration-300 py-3 px-4 rounded-lg font-medium"
               onClick={() => setIsOpen(false)}
             >
               Events
             </Link>
             <Link
               to="/blog"
-              className="block w-full text-left text-foreground hover:text-primary transition-colors py-2"
+              className="block w-full text-left text-white hover:text-accent hover:bg-white/10 transition-all duration-300 py-3 px-4 rounded-lg font-medium"
               onClick={() => setIsOpen(false)}
             >
               Blog
             </Link>
             <Link
               to="/gallery"
-              className="block w-full text-left text-foreground hover:text-primary transition-colors py-2"
+              className="block w-full text-left text-white hover:text-accent hover:bg-white/10 transition-all duration-300 py-3 px-4 rounded-lg font-medium"
               onClick={() => setIsOpen(false)}
             >
               Gallery
             </Link>
             <Link
               to="/contact"
-              className="block w-full text-left text-foreground hover:text-primary transition-colors py-2"
+              className="block w-full text-left text-white hover:text-accent hover:bg-white/10 transition-all duration-300 py-3 px-4 rounded-lg font-medium"
               onClick={() => setIsOpen(false)}
             >
               Contact
             </Link>
 
             {isAuthenticated ? (
-              <div className="space-y-2 pt-2 border-t border-border">
-                <div className="flex items-center gap-3 px-2">
+              <div className="space-y-2 pt-4 border-t border-white/20">
+                <div className="flex items-center gap-3 px-4 py-2 bg-white/10 rounded-lg">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={user?.avatar} alt={user?.name} />
                     <AvatarFallback>{user?.name?.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-medium text-sm">{user?.name}</p>
-                    <p className="text-xs text-muted-foreground">{user?.email}</p>
+                    <p className="font-medium text-sm text-white">{user?.name}</p>
+                    <p className="text-xs text-white/70">{user?.email}</p>
                   </div>
                 </div>
                 <Link
                   to="/profile"
-                  className="block w-full text-left text-foreground hover:text-primary transition-colors py-2"
+                  className="block w-full text-left text-white hover:text-accent hover:bg-white/10 transition-all duration-300 py-3 px-4 rounded-lg font-medium"
                   onClick={() => setIsOpen(false)}
                 >
                   Profile
@@ -197,7 +197,7 @@ const Navbar = () => {
                 {user?.role === 'admin' && (
                   <Link
                     to="/admin"
-                    className="block w-full text-left text-foreground hover:text-primary transition-colors py-2"
+                    className="block w-full text-left text-white hover:text-accent hover:bg-white/10 transition-all duration-300 py-3 px-4 rounded-lg font-medium"
                     onClick={() => setIsOpen(false)}
                   >
                     Admin Dashboard
@@ -206,7 +206,7 @@ const Navbar = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full"
+                  className="w-full bg-white/20 border-white/30 text-white hover:bg-white/30 hover:text-accent transition-all duration-300"
                   onClick={() => {
                     logout();
                     setIsOpen(false);
@@ -216,14 +216,14 @@ const Navbar = () => {
                 </Button>
               </div>
             ) : (
-              <div className="space-y-2 pt-2 border-t border-border">
+              <div className="space-y-2 pt-4 border-t border-white/20">
                 <Link to="/login" onClick={() => setIsOpen(false)}>
-                  <Button variant="ghost" size="sm" className="w-full">
+                  <Button variant="ghost" size="sm" className="w-full bg-white/20 border-white/30 text-white hover:bg-white/30 hover:text-accent transition-all duration-300">
                     Sign In
                   </Button>
                 </Link>
                 <Link to="/register" onClick={() => setIsOpen(false)}>
-                  <Button variant="default" size="sm" className="w-full">
+                  <Button variant="default" size="sm" className="w-full bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90 transition-all duration-300 shadow-lg">
                     Join BITSA
                   </Button>
                 </Link>

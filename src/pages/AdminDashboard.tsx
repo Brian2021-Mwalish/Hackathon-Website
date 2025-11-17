@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -7,16 +7,126 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, FileText, Calendar, Image, BarChart3, Settings } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Users, FileText, Calendar, Image, BarChart3, Settings, UserPlus, Ban, CheckCircle } from "lucide-react";
+import { toast } from "sonner";
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  is_staff: boolean;
+  is_active: boolean;
+  date_joined: string;
+}
 
 const AdminDashboard = () => {
   const { user, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
+  const [newUser, setNewUser] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: '',
+    password_confirm: ''
+  });
 
   // Redirect if not authenticated or not admin
   if (!isAuthenticated || !user?.is_staff) {
     return <Navigate to="/login" replace />;
   }
+
+  const API_BASE_URL = 'http://localhost:8000/api';
+  const accessToken = localStorage.getItem('access_token');
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/users/`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data);
+      } else {
+        toast.error('Failed to fetch users');
+      }
+    } catch (error) {
+      toast.error('Error fetching users');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addUser = async () => {
+    if (!newUser.first_name || !newUser.email || !newUser.password || !newUser.password_confirm) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    if (newUser.password !== newUser.password_confirm) {
+      toast.error('Passwords do not match');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/users/add/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(newUser),
+      });
+
+      if (response.ok) {
+        toast.success('User added successfully');
+        setAddUserDialogOpen(false);
+        setNewUser({ first_name: '', last_name: '', email: '', password: '', password_confirm: '' });
+        fetchUsers();
+      } else {
+        const error = await response.json();
+        toast.error(error.error || 'Failed to add user');
+      }
+    } catch (error) {
+      toast.error('Error adding user');
+    }
+  };
+
+  const toggleUserBlock = async (userId: number) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/users/${userId}/toggle-block/`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        toast.success('User status updated');
+        fetchUsers();
+      } else {
+        toast.error('Failed to update user status');
+      }
+    } catch (error) {
+      toast.error('Error updating user status');
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'users') {
+      fetchUsers();
+    }
+  }, [activeTab]);
 
   const stats = [
     {
@@ -94,7 +204,7 @@ const AdminDashboard = () => {
                       <div className="text-2xl font-bold">{stat.value}</div>
                       <p className={`text-xs ${
                         stat.changeType === 'positive' ? 'text-green-600' :
-                        stat.changeType === 'negative' ? 'text-red-600' :
+                        stat.changeType === 'neutral' ? 'text-muted-foreground' :
                         'text-muted-foreground'
                       }`}>
                         {stat.change}
@@ -157,8 +267,144 @@ const AdminDashboard = () => {
                 <CardDescription>Manage registered users and permissions</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">User management features coming soon...</p>
-                <Button className="mt-4">Add New User</Button>
+                <div className="flex justify-between items-center mb-4">
+                  <div>
+                    <h3 className="text-lg font-medium">All Users</h3>
+                    <p className="text-sm text-muted-foreground">Manage user accounts and permissions</p>
+                  </div>
+                  <Dialog open={addUserDialogOpen} onOpenChange={setAddUserDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button>
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Add New User
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add New User</DialogTitle>
+                        <DialogDescription>
+                          Create a new user account for the system.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="first_name">First Name *</Label>
+                            <Input
+                              id="first_name"
+                              value={newUser.first_name}
+                              onChange={(e) => setNewUser({ ...newUser, first_name: e.target.value })}
+                              placeholder="Enter first name"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="last_name">Last Name</Label>
+                            <Input
+                              id="last_name"
+                              value={newUser.last_name}
+                              onChange={(e) => setNewUser({ ...newUser, last_name: e.target.value })}
+                              placeholder="Enter last name"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="email">Email *</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            value={newUser.email}
+                            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                            placeholder="Enter email address"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="password">Password *</Label>
+                          <Input
+                            id="password"
+                            type="password"
+                            value={newUser.password}
+                            onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                            placeholder="Enter password"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="password_confirm">Confirm Password *</Label>
+                          <Input
+                            id="password_confirm"
+                            type="password"
+                            value={newUser.password_confirm}
+                            onChange={(e) => setNewUser({ ...newUser, password_confirm: e.target.value })}
+                            placeholder="Confirm password"
+                          />
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" onClick={() => setAddUserDialogOpen(false)}>
+                            Cancel
+                          </Button>
+                          <Button onClick={addUser}>
+                            Add User
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+
+                {loading ? (
+                  <p>Loading users...</p>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Joined</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {users.map((user) => (
+                        <TableRow key={user.id}>
+                          <TableCell className="font-medium">{user.name}</TableCell>
+                          <TableCell>{user.email}</TableCell>
+                          <TableCell>
+                            <Badge variant={user.is_staff ? "default" : "secondary"}>
+                              {user.role}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={user.is_active ? "default" : "destructive"}>
+                              {user.is_active ? "Active" : "Blocked"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{new Date(user.date_joined).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => toggleUserBlock(user.id)}
+                              className={user.is_active ? "text-red-600 hover:text-red-700" : "text-green-600 hover:text-green-700"}
+                            >
+                              {user.is_active ? (
+                                <>
+                                  <Ban className="h-4 w-4 mr-1" />
+                                  Block
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle className="h-4 w-4 mr-1" />
+                                  Unblock
+                                </>
+                              )}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
