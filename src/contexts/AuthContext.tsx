@@ -104,6 +104,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (data: RegisterData): Promise<boolean> => {
     try {
+      const trimmedName = data.name.trim();
+      const nameParts = trimmedName.split(/\s+/);
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
       const response = await fetch(`${API_BASE_URL}/auth/register/`, {
         method: 'POST',
         headers: {
@@ -114,20 +119,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           email: data.email,
           password: data.password,
           password_confirm: data.confirmPassword,
-          first_name: data.name.split(' ')[0] || '',
-          last_name: data.name.split(' ').slice(1).join(' ') || '',
+          first_name: firstName,
+          last_name: lastName,
         }),
       });
 
       if (response.ok) {
         const userData = await response.json();
         const user: User = {
-          id: userData.id.toString(),
-          email: userData.email,
-          name: `${userData.first_name} ${userData.last_name}`.trim() || userData.username,
-          role: userData.is_staff ? 'admin' : 'student',
-          is_staff: userData.is_staff,
-          createdAt: new Date(userData.date_joined),
+          id: userData.user.id.toString(),
+          email: userData.user.email,
+          name: `${userData.user.first_name} ${userData.user.last_name}`.trim() || userData.user.username,
+          role: userData.user.is_staff ? 'admin' : 'student',
+          is_staff: userData.user.is_staff,
+          createdAt: new Date(userData.user.date_joined),
           updatedAt: new Date(),
         };
 
@@ -136,7 +141,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           isAuthenticated: true,
           isLoading: false,
         });
+
+        // Store tokens and user data
+        localStorage.setItem('access_token', userData.access);
+        localStorage.setItem('refresh_token', userData.refresh);
         localStorage.setItem('bitsa_user', JSON.stringify(user));
+
         return true;
       }
       return false;
