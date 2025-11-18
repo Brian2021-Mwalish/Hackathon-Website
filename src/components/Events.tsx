@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +19,7 @@ interface Event {
 }
 
 const Events = () => {
+  const navigate = useNavigate();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -108,7 +110,7 @@ const Events = () => {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button variant="outline" className="w-full group">
+                <Button variant="outline" className="w-full group" onClick={() => navigate('/events')}>
                   Learn More
                   <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>

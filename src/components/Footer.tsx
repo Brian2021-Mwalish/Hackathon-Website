@@ -5,7 +5,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-card border-t border-border">
+    <footer className="bg-blue-900 border-t border-white">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
@@ -13,7 +13,7 @@ const Footer = () => {
               <img src="/bitsa logo.png" alt="BITSA Logo" className="w-10 h-10 rounded-lg" />
               <span className="text-xl font-bold">BITSA</span>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-white">
               Empowering IT students through innovation, collaboration, and excellence.
             </p>
           </div>
@@ -30,7 +30,7 @@ const Footer = () => {
 
           <div>
             <h3 className="font-semibold mb-4">Resources</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="space-y-2 text-sm text-white">
               <li><Link to="/gallery" className="hover:text-primary transition-colors">Gallery</Link></li>
               <li><Link to="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
               <li><a href="#" className="hover:text-primary transition-colors">Join BITSA</a></li>
@@ -43,14 +43,14 @@ const Footer = () => {
             <div className="space-y-3">
               <a
                 href="mailto:bitsaclub@ueab.ac.ke"
-                className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
+                className="flex items-center text-sm text-white hover:text-primary transition-colors"
               >
                 <Mail size={16} className="mr-2" />
                 bitsaclub@ueab.ac.ke
               </a>
               <a
                 href="tel:0708898899"
-                className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
+                className="flex items-center text-sm text-white hover:text-primary transition-colors"
               >
                 <Phone size={16} className="mr-2" />
                 0708 898 899
@@ -70,7 +70,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
+        <div className="border-t border-white mt-8 pt-8 text-center text-sm text-white">
           <p>© {currentYear} BITSA - Bachelor of Information Technology Students Association. All rights reserved.</p>
         </div>
       </div>

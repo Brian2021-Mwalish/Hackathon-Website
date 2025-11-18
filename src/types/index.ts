@@ -21,9 +21,27 @@ export interface BlogPost {
   tags: string[];
   status: 'draft' | 'published';
   readTime: number;
+  image_url: string | null;
   createdAt: Date;
   updatedAt: Date;
   publishedAt?: Date;
+}
+
+export interface BlogPostAPI {
+  id: number;
+  title: string;
+  content: string;
+  excerpt: string;
+  author: number;
+  author_name: string;
+  author_email: string;
+  category: string;
+  read_time: number;
+  is_published: boolean;
+  image_url: string | null;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
 }
 
 export interface Event {
@@ -37,6 +55,7 @@ export interface Event {
   status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
   maxAttendees?: number;
   registeredAttendees: string[];
+  image: string | null;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Photo {
   id: number;
@@ -10,6 +11,7 @@ interface Photo {
 }
 
 const Gallery = () => {
+  const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,8 +88,13 @@ const Gallery = () => {
           </div>
         )}
 
-        <div className="text-center mt-8 text-sm text-muted-foreground">
-          <p>📷 Photos from BITSA events and activities</p>
+        <div className="text-center mt-8">
+          <button
+            onClick={() => navigate('/gallery')}
+            className="text-sm text-muted-foreground hover:text-primary transition-colors"
+          >
+            📷 View all photos from BITSA events and activities
+          </button>
         </div>
       </div>
     </section>

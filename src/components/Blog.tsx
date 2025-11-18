@@ -4,27 +4,11 @@ import { Calendar, User, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-interface BlogPost {
-  id: number;
-  title: string;
-  content: string;
-  excerpt: string;
-  author: number;
-  author_name: string;
-  author_email: string;
-  category: string;
-  tags: string;
-  read_time: number;
-  is_published: boolean;
-  created_at: string;
-  updated_at: string;
-  published_at: string | null;
-}
+import { BlogPostAPI } from "@/types";
 
 const Blog = () => {
   const navigate = useNavigate();
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [posts, setPosts] = useState<BlogPostAPI[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -67,6 +51,15 @@ const Blog = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {posts.map((post) => (
               <Card key={post.id} className="hover:shadow-xl transition-all border-border group">
+                {post.image_url && (
+                  <div className="aspect-video relative overflow-hidden rounded-t-lg">
+                    <img
+                      src={post.image_url}
+                      alt={post.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
                 <CardHeader>
                   <div className="flex items-center justify-between mb-2">
                     <Badge variant="secondary" className="text-xs">
@@ -115,7 +108,7 @@ const Blog = () => {
         )}
 
         <div className="text-center mt-12">
-          <Button size="lg" variant="outline">
+          <Button size="lg" variant="outline" onClick={() => navigate('/blog')}>
             View All Articles
           </Button>
         </div>

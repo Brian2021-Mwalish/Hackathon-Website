@@ -262,10 +262,10 @@ const Hero = () => {
               are designed to challenge your skills, spark creativity, and connect you with cutting-edge 
               technologies and industry trends.
             </p>
-            <div className="flex items-center text-purple-600 font-semibold">
+            <Link to="/events" className="flex items-center text-purple-600 font-semibold hover:text-purple-700 transition-colors">
               <span>View Events</span>
               <ArrowRight className="ml-2 w-4 h-4" />
-            </div>
+            </Link>
           </div>
 
           <div className="group p-8 rounded-3xl bg-gradient-to-br from-white to-indigo-50/50 backdrop-blur-sm border border-indigo-200 hover:border-indigo-400 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3">
@@ -278,10 +278,10 @@ const Hero = () => {
               industry insights. Continuously updated content ensures you stay ahead in the rapidly 
               evolving world of information technology.
             </p>
-            <div className="flex items-center text-indigo-600 font-semibold">
+            <Link to="/blog" className="flex items-center text-indigo-600 font-semibold hover:text-indigo-700 transition-colors">
               <span>Browse Resources</span>
               <ArrowRight className="ml-2 w-4 h-4" />
-            </div>
+            </Link>
           </div>
         </div>
       </div>

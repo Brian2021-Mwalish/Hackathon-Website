@@ -27,7 +27,9 @@ urlpatterns = [
     path('gallery/', include('gallery.urls')),
     path('api/gallery/', include('gallery.urls')),
     path('blogs/', include('blogs.urls')),
+    path('api/blogs/', include('blogs.urls')),
     path('events/', include('events.urls')),
+    path('api/events/', include('events.urls')),
 ]
 
 # Serve media files from MEDIA_URL -> MEDIA_ROOT for testing environments.

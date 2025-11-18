@@ -103,7 +103,8 @@ const AdminDashboard = () => {
     excerpt: '',
     category: 'General',
     tags: '',
-    read_time: 5
+    read_time: 5,
+    image: null as File | null
   });
   const [editBlogPost, setEditBlogPost] = useState({
     title: '',
@@ -111,7 +112,8 @@ const AdminDashboard = () => {
     excerpt: '',
     category: 'General',
     tags: '',
-    read_time: 5
+    read_time: 5,
+    image: null as File | null
   });
   const [events, setEvents] = useState<Event[]>([]);
   const [addEventDialogOpen, setAddEventDialogOpen] = useState(false);
@@ -133,6 +135,7 @@ const AdminDashboard = () => {
     location: '',
     category: 'hackathon'
   });
+
 
   // Redirect if not authenticated or not admin/superuser
   if (!isAuthenticated || (!user?.is_staff && !user?.is_superuser)) {
@@ -427,14 +430,24 @@ const AdminDashboard = () => {
       return;
     }
 
+    const formData = new FormData();
+    formData.append('title', newBlogPost.title);
+    formData.append('content', newBlogPost.content);
+    formData.append('excerpt', newBlogPost.excerpt);
+    formData.append('category', newBlogPost.category);
+    formData.append('tags', newBlogPost.tags);
+    formData.append('read_time', newBlogPost.read_time.toString());
+    if (newBlogPost.image) {
+      formData.append('image', newBlogPost.image);
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/blogs/posts/`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${accessToken}`,
         },
-        body: JSON.stringify(newBlogPost),
+        body: formData,
       });
 
       if (response.ok) {
@@ -446,7 +459,8 @@ const AdminDashboard = () => {
           excerpt: '',
           category: 'General',
           tags: '',
-          read_time: 5
+          read_time: 5,
+          image: null
         });
         fetchBlogPosts();
       } else {
@@ -466,7 +480,8 @@ const AdminDashboard = () => {
       excerpt: post.excerpt,
       category: post.category,
       tags: post.tags,
-      read_time: post.read_time
+      read_time: post.read_time,
+      image: null
     });
     setEditBlogDialogOpen(true);
   };
@@ -497,7 +512,8 @@ const AdminDashboard = () => {
           excerpt: '',
           category: 'General',
           tags: '',
-          read_time: 5
+          read_time: 5,
+          image: null
         });
         fetchBlogPosts();
       } else {
@@ -1083,6 +1099,15 @@ const AdminDashboard = () => {
                             placeholder="Enter tags separated by commas"
                           />
                         </div>
+                        <div>
+                          <Label htmlFor="blog_image">Image (optional)</Label>
+                          <Input
+                            id="blog_image"
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setNewBlogPost({ ...newBlogPost, image: e.target.files?.[0] || null })}
+                          />
+                        </div>
                         <div className="flex justify-end gap-2">
                           <Button variant="outline" onClick={() => setAddBlogDialogOpen(false)}>
                             Cancel
@@ -1525,6 +1550,15 @@ const AdminDashboard = () => {
                   value={editBlogPost.tags}
                   onChange={(e) => setEditBlogPost({ ...editBlogPost, tags: e.target.value })}
                   placeholder="Enter tags separated by commas"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit_blog_image">Image (optional)</Label>
+                <Input
+                  id="edit_blog_image"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setEditBlogPost({ ...editBlogPost, image: e.target.files?.[0] || null })}
                 />
               </div>
               <div className="flex justify-end gap-2">

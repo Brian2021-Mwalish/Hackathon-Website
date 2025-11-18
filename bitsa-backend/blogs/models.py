@@ -10,6 +10,7 @@ class BlogPost(models.Model):
     tags = models.CharField(max_length=500, blank=True, help_text="Comma-separated tags")
     read_time = models.PositiveIntegerField(default=5, help_text="Estimated read time in minutes")
     is_published = models.BooleanField(default=False)
+    image = models.ImageField(upload_to='blogs/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     published_at = models.DateTimeField(null=True, blank=True)

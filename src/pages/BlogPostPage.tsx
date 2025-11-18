@@ -19,6 +19,7 @@ interface BlogPost {
   tags: string;
   read_time: number;
   is_published: boolean;
+  image: string | null;
   created_at: string;
   updated_at: string;
   published_at: string | null;
@@ -117,6 +118,16 @@ const BlogPostPage = () => {
               <p className="text-lg text-muted-foreground">
                 {post.excerpt}
               </p>
+
+              {post.image && (
+                <div className="aspect-video relative overflow-hidden rounded-lg mt-6">
+                  <img
+                    src={`http://localhost:8000${post.image}`}
+                    alt={post.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
 
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center">

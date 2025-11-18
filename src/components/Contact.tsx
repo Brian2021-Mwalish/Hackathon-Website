@@ -1,5 +1,6 @@
 import { Mail, Phone, MapPin, User, MessageCircle, Send, Clock, Users } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 
 const Contact = () => {
   const leadership = [
@@ -198,14 +199,18 @@ const Contact = () => {
               Don't wait to start your tech journey. Connect with us today and become part of our growing community of innovators.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-8 py-4 bg-white text-blue-600 rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-2">
-                <MessageCircle className="w-5 h-5" />
-                Send Message
-              </button>
-              <button className="px-8 py-4 border-2 border-white text-white rounded-2xl font-bold hover:bg-white/10 transition-all duration-300 flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                Join Community
-              </button>
+              <Link to="/register">
+                <button className="px-8 py-4 bg-white text-blue-600 rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-2">
+                  <MessageCircle className="w-5 h-5" />
+                  Send Message
+                </button>
+              </Link>
+              <Link to="/register">
+                <button className="px-8 py-4 border-2 border-white text-white rounded-2xl font-bold hover:bg-white/10 transition-all duration-300 flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Join Community
+                </button>
+              </Link>
             </div>
           </div>
         </div>

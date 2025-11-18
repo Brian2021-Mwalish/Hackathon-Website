@@ -1,4 +1,5 @@
 import { Code, Lightbulb, Users2, Trophy, Target, Heart, Sparkles, Rocket, Calendar, Star } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const About = () => {
   const values = [
@@ -181,12 +182,16 @@ const About = () => {
             Ready to join our community of innovators?
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-              Join BITSA Today
-            </button>
-            <button className="px-8 py-4 border-2 border-blue-300 text-blue-700 hover:bg-blue-50 rounded-2xl font-semibold transition-all duration-300">
-              Learn More
-            </button>
+            <Link to="/register">
+              <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                Join BITSA Today
+              </button>
+            </Link>
+            <Link to="/events">
+              <button className="px-8 py-4 border-2 border-blue-300 text-blue-700 hover:bg-blue-50 rounded-2xl font-semibold transition-all duration-300">
+                Learn More
+              </button>
+            </Link>
           </div>
         </div>
       </div>
