@@ -1,6 +1,6 @@
 # Update to Allow Superusers to Access Admin Dashboard
 
-## Backend Changes
+## Backend Changes 
 - [x] Update UserSerializer to include `is_superuser` field
 - [x] Update login view to return `is_superuser` in response
 - [x] Update register view to return `is_superuser` in response
