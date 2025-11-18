@@ -6,7 +6,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.db.models import Q
-from .serializers import RegisterSerializer, UserSerializer
+from .serializers import RegisterSerializer, UserSerializer, CustomTokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
@@ -25,6 +26,7 @@ def register(request):
                     "last_name": user.last_name,
                     "username": user.username,
                     "is_staff": user.is_staff,
+                    "is_superuser": user.is_superuser,
                     "date_joined": user.date_joined,
                 },
                 "access": str(refresh.access_token),
@@ -65,6 +67,7 @@ def login(request):
                 'last_name': user.last_name,
                 'username': user.username,
                 'is_staff': user.is_staff,
+                'is_superuser': user.is_superuser,
                 'date_joined': user.date_joined,
             },
             'access': str(refresh.access_token),
@@ -110,3 +113,6 @@ def toggle_user_block(request, user_id):
         return Response(serializer.data, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer

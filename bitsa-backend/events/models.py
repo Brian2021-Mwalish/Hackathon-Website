@@ -1,37 +1,39 @@
 from django.db import models
-from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
-# Create your models here.
 class Event(models.Model):
-    CATEGORY_CHOICES = [
-        ("hackathon", "Hackathon"),
-        ("workshop", "Workshop"),
-        ("talk", "Talk"),
-        ("meeting", "Meeting"),
-        ("competition", "Competition"),
-        ("other", "Other"),
-    ]
-
-    STATUS_CHOICES = [
-        ("upcoming", "Upcoming"),
-        ("ongoing", "Ongoing"),
-        ("past", "Past"),
-    ]
-
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    date = models.DateField()
-    time = models.TimeField()
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    organizer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='organized_events')
     location = models.CharField(max_length=255, blank=True)
-    category = models.CharField(max_length=32, choices=CATEGORY_CHOICES, default="hackathon")
-    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default="upcoming")
-    posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="posted_events")
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField(null=True, blank=True)
+    is_public = models.BooleanField(default=True)
+    capacity = models.PositiveIntegerField(null=True, blank=True, help_text="Maximum number of attendees (optional)")
+    attendees = models.ManyToManyField(User, blank=True, related_name='events_attending')
+    image = models.ImageField(upload_to='events/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-date", "-time"]
+        ordering = ['-start_time']
 
     def __str__(self):
-        return f"{self.title} ({self.date})"
+        return self.title
 
+    @property
+    def attendees_count(self):
+        return self.attendees.count()
+
+    def clean(self):
+        # Ensure capacity is not less than current attendees when saving
+        if self.capacity is not None and self.pk is not None:
+            current_attendees = self.attendees.count()
+            if self.capacity < current_attendees:
+                raise ValidationError("Capacity cannot be less than current number of attendees.")
+
+    def save(self, *args, **kwargs):
+        # run clean to enforce capacity constraint
+        self.clean()
+        super().save(*args, **kwargs)

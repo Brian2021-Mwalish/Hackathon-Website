@@ -1,19 +1,17 @@
-# Events CRUD Implementation Plan
+# Update to Allow Superusers to Access Admin Dashboard
 
-## Backend Implementation
-- [x] Create Event model with fields: title, description, date, time, location, category, status, created_at, updated_at
-- [x] Create EventSerializer
-- [x] Create EventViewSet with CRUD operations
-- [x] Create URLs for events API
-- [x] Register Event model in admin
-- [x] Include events URLs in main API URLs
-- [x] Run migrations after model creation
+## Backend Changes
+- [x] Update UserSerializer to include `is_superuser` field
+- [x] Update login view to return `is_superuser` in response
+- [x] Update register view to return `is_superuser` in response
+- [x] Update CustomTokenObtainPairSerializer to include `is_superuser` in response
 
-## Frontend Updates
-- [ ] Update Events.tsx to fetch events from API
-- [ ] Update AdminDashboard.tsx events tab with full CRUD UI (add, edit, delete events)
+## Frontend Changes
+- [x] Update User interface in types to include `is_superuser`
+- [x] Update AuthContext to handle `is_superuser` in user objects
+- [x] Update LoginPage navigation condition to include superusers
+- [x] Update AdminDashboard access condition to include superusers
 
-## Followup Steps
-- [ ] Run migrations after model creation
-- [ ] Test API endpoints
-- [ ] Test frontend integration
+## Testing
+- [ ] Test login with superuser account
+- [ ] Verify admin dashboard access for superusers

@@ -4,7 +4,7 @@ import { User, AuthState, LoginCredentials, RegisterData } from '@/types';
 const API_BASE_URL = 'http://localhost:8000/api';
 
 interface AuthContextType extends AuthState {
-  login: (credentials: LoginCredentials) => Promise<boolean>;
+  login: (credentials: LoginCredentials) => Promise<User | null>;
   register: (data: RegisterData) => Promise<boolean>;
   logout: () => void;
   updateProfile: (updates: Partial<User>) => Promise<boolean>;
@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
-  const login = async (credentials: LoginCredentials): Promise<boolean> => {
+  const login = async (credentials: LoginCredentials): Promise<User | null> => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login/`, {
         method: 'POST',
@@ -78,6 +78,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           name: `${data.user.first_name} ${data.user.last_name}`.trim() || data.user.username,
           role: data.user.is_staff ? 'admin' : 'student',
           is_staff: data.user.is_staff,
+          is_superuser: data.user.is_superuser,
           createdAt: new Date(data.user.date_joined),
           updatedAt: new Date(),
         };
@@ -93,12 +94,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         localStorage.setItem('refresh_token', data.refresh);
         localStorage.setItem('bitsa_user', JSON.stringify(user));
 
-        return true;
+        return user;
       }
-      return false;
+      return null;
     } catch (error) {
       console.error('Login error:', error);
-      return false;
+      return null;
     }
   };
 
@@ -132,6 +133,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           name: `${userData.user.first_name} ${userData.user.last_name}`.trim() || userData.user.username,
           role: userData.user.is_staff ? 'admin' : 'student',
           is_staff: userData.user.is_staff,
+          is_superuser: userData.user.is_superuser,
           createdAt: new Date(userData.user.date_joined),
           updatedAt: new Date(),
         };

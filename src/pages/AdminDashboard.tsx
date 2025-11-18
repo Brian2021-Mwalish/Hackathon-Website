@@ -134,8 +134,8 @@ const AdminDashboard = () => {
     category: 'hackathon'
   });
 
-  // Redirect if not authenticated or not admin
-  if (!isAuthenticated || !user?.is_staff) {
+  // Redirect if not authenticated or not admin/superuser
+  if (!isAuthenticated || (!user?.is_staff && !user?.is_superuser)) {
     return <Navigate to="/login" replace />;
   }
 

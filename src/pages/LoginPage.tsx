@@ -37,13 +37,13 @@ const LoginPage = () => {
     setError("");
 
     try {
-      const success = await login({
+      const loggedInUser = await login({
         email: data.email,
         password: data.password,
       });
-      if (success) {
-        // Navigate to admin dashboard if user is staff, otherwise to home
-        if (user?.is_staff) {
+      if (loggedInUser) {
+        // Navigate to admin dashboard if user is staff or superuser, otherwise to home
+        if (loggedInUser.is_staff || loggedInUser.is_superuser) {
           navigate("/admin");
         } else {
           navigate("/");

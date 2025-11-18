@@ -4,6 +4,7 @@ export interface User {
   name: string;
   role: 'student' | 'admin';
   is_staff: boolean;
+  is_superuser: boolean;
   avatar?: string;
   createdAt: Date;
   updatedAt: Date;
