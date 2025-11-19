@@ -1,12 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 class Event(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     organizer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='organized_events')
     location = models.CharField(max_length=255, blank=True)
+    category = models.CharField(max_length=50, default='hackathon')
     start_time = models.DateTimeField()
     end_time = models.DateTimeField(null=True, blank=True)
     is_public = models.BooleanField(default=True)
@@ -25,6 +27,23 @@ class Event(models.Model):
     @property
     def attendees_count(self):
         return self.attendees.count()
+
+    @property
+    def status(self):
+        now = timezone.now()
+        start_time = self.start_time
+        if timezone.is_naive(start_time):
+            start_time = timezone.make_aware(start_time)
+        if self.end_time:
+            end_time = self.end_time
+            if timezone.is_naive(end_time):
+                end_time = timezone.make_aware(end_time)
+            if now > end_time:
+                return 'completed'
+        if now >= start_time:
+            return 'ongoing'
+        else:
+            return 'upcoming'
 
     def clean(self):
         # Ensure capacity is not less than current attendees when saving

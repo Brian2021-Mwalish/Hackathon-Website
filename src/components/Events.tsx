@@ -14,6 +14,7 @@ interface Event {
   location: string;
   category: string;
   status: string;
+  image: string;
   created_at: string;
   updated_at: string;
 }
@@ -29,7 +30,7 @@ const Events = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/events/events/');
+      const response = await fetch('http://localhost:8000/api/events/');
       if (response.ok) {
         const data = await response.json();
         setEvents(data);

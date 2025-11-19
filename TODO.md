@@ -1,1 +1,2 @@
-- [ ] Update src/pages/BlogPostPage.tsx to fix image src by removing the prepend of backend URL, as the API returns full URL
+- [ ] Modify bitsa-backend/events/views.py to allow authenticated non-staff users to see all events instead of only public or their own.
+- [ ] Test the changes by running the server and verifying event visibility for students.

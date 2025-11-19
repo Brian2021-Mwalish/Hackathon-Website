@@ -62,6 +62,7 @@ interface Event {
   location: string;
   category: string;
   status: string;
+  image_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -125,7 +126,8 @@ const AdminDashboard = () => {
     date: '',
     time: '',
     location: '',
-    category: 'hackathon'
+    category: 'hackathon',
+    image: null as File | null
   });
   const [editEvent, setEditEvent] = useState({
     title: '',
@@ -133,7 +135,8 @@ const AdminDashboard = () => {
     date: '',
     time: '',
     location: '',
-    category: 'hackathon'
+    category: 'hackathon',
+    image: null as File | null
   });
 
 
@@ -552,14 +555,24 @@ const AdminDashboard = () => {
       return;
     }
 
+    const formData = new FormData();
+    formData.append('title', newEvent.title);
+    formData.append('description', newEvent.description);
+    formData.append('date', newEvent.date);
+    formData.append('time', newEvent.time);
+    formData.append('location', newEvent.location);
+    formData.append('category', newEvent.category);
+    if (newEvent.image) {
+      formData.append('image', newEvent.image);
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/events/`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${accessToken}`,
         },
-        body: JSON.stringify(newEvent),
+        body: formData,
       });
 
       if (response.ok) {
@@ -571,7 +584,8 @@ const AdminDashboard = () => {
           date: '',
           time: '',
           location: '',
-          category: 'hackathon'
+          category: 'hackathon',
+          image: null
         });
         fetchEvents();
       } else {
@@ -591,7 +605,8 @@ const AdminDashboard = () => {
       date: event.date,
       time: event.time,
       location: event.location,
-      category: event.category
+      category: event.category,
+      image: null
     });
     setEditEventDialogOpen(true);
   };
@@ -622,7 +637,8 @@ const AdminDashboard = () => {
           date: '',
           time: '',
           location: '',
-          category: 'hackathon'
+          category: 'hackathon',
+          image: null
         });
         fetchEvents();
       } else {
@@ -1216,7 +1232,7 @@ const AdminDashboard = () => {
                         Add Event
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
+                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                       <DialogHeader>
                         <DialogTitle>Add New Event</DialogTitle>
                         <DialogDescription>
@@ -1289,6 +1305,15 @@ const AdminDashboard = () => {
                               </SelectContent>
                             </Select>
                           </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="event_image">Image (optional)</Label>
+                          <Input
+                            id="event_image"
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setNewEvent({ ...newEvent, image: e.target.files?.[0] || null })}
+                          />
                         </div>
                         <div className="flex justify-end gap-2">
                           <Button variant="outline" onClick={() => setAddEventDialogOpen(false)}>

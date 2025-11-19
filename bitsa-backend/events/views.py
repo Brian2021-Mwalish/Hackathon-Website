@@ -28,13 +28,7 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = Event.objects.all()
-        # Visibility: public events for anonymous; for authenticated non-staff only public or their own
-        user = getattr(self.request, 'user', None)
-        if self.action in ['list', 'retrieve']:
-            if not user or not user.is_authenticated:
-                qs = qs.filter(is_public=True)
-            elif not user.is_staff:
-                qs = qs.filter(models.Q(is_public=True) | models.Q(organizer=user))
+        # Visibility: all events for everyone (for viewing purposes)
 
         # Filters
         organizer = self.request.query_params.get('organizer')
