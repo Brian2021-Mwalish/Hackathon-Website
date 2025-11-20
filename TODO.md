@@ -1,2 +1,4 @@
-- [ ] Modify bitsa-backend/events/views.py to allow authenticated non-staff users to see all events instead of only public or their own.
-- [ ] Test the changes by running the server and verifying event visibility for students.
+# TODO: Update Register Page
+
+- [x] Add navigation back button at top left of register form that navigates to Home
+- [x] Change name placeholder from "John Doe" to "Bitsa Lab"

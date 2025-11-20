@@ -87,6 +87,15 @@ const Events = () => {
           {events.map((event) => (
             <Card key={event.id} className="hover:shadow-xl transition-shadow border-border">
               <CardHeader>
+                {event.image && (
+                  <div className="w-full h-48 mb-4 overflow-hidden rounded-lg">
+                    <img
+                      src={event.image}
+                      alt={event.title}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                )}
                 <div className="flex items-start justify-between mb-2">
                   <Badge variant="secondary" className="bg-accent/10 text-accent">
                     {event.category.charAt(0).toUpperCase() + event.category.slice(1)}

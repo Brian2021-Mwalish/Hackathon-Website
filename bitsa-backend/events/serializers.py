@@ -6,7 +6,14 @@ class EventSerializer(serializers.ModelSerializer):
     organizer_name = serializers.CharField(source='organizer.get_full_name', read_only=True)
     organizer_email = serializers.CharField(source='organizer.email', read_only=True)
     attendees_count = serializers.IntegerField(read_only=True)
-    image = serializers.ImageField(required=False, allow_null=True)
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+        return None
     date = serializers.SerializerMethodField()
     time = serializers.SerializerMethodField()
 

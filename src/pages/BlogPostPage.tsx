@@ -19,7 +19,7 @@ interface BlogPost {
   tags: string;
   read_time: number;
   is_published: boolean;
-  image: string | null;
+  image_url: string | null;
   created_at: string;
   updated_at: string;
   published_at: string | null;
@@ -119,10 +119,10 @@ const BlogPostPage = () => {
                 {post.excerpt}
               </p>
 
-              {post.image && (
+              {post.image_url && (
                 <div className="aspect-video relative overflow-hidden rounded-lg mt-6">
                   <img
-                    src={`http://localhost:8000${post.image}`}
+                    src={post.image_url}
                     alt={post.title}
                     className="w-full h-full object-cover"
                   />
